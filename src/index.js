@@ -7,13 +7,38 @@ const fs = require('fs');
 const commonHandler = commandName => async argv => {
 
     let throbber;
-    let db, db_pdb;
+    let db;
 
     // CTRL+C CONTROLLER
     process.on('SIGINT', async () => {
         console.log(chalk.red('\nProcess interrupted by user'));
         process.exit(0);
     });
+
+    // CHECK IF DB_LOGIN AND DB_PASSWORD PROVIDED
+    let mongoAuth = {};
+    if (!process.env.DB_LOGIN || !process.env.DB_PASSWORD) {
+        // connecting to mongo without authentication
+        mongoAuth = {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            connectTimeoutMS: 0,
+            socketTimeoutMS: 0, // In order to avoid Mongo connection time out
+        };
+    } else {
+        // connecting to mongo with authentication
+        mongoAuth = {
+            auth: {
+                user: process.env.DB_LOGIN,
+                password: process.env.DB_PASSWORD,
+            },
+            authSource: process.env.DB_AUTHSOURCE,
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            connectTimeoutMS: 0,
+            socketTimeoutMS: 0, // In order to avoid Mongo connection time out
+        };
+    }
 
     try {
         // CHECK IF MONGODB CONNEXION
@@ -26,17 +51,7 @@ const commonHandler = commandName => async argv => {
 
                 client = await mongodb.MongoClient.connect(
                     `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`,
-                    {
-                        auth: {
-                            user: process.env.DB_LOGIN,
-                            password: process.env.DB_PASSWORD,
-                        },
-                        authSource: process.env.DB_AUTHSOURCE,
-                        useNewUrlParser: true,
-                        useUnifiedTopology: true,
-                        connectTimeoutMS: 0,
-                        socketTimeoutMS: 0, // In order to avoid Mongo connection time out
-                    },
+                    mongoAuth
                 );
 
                 // Get the main database
