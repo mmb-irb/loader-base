@@ -1,0 +1,19 @@
+{
+  "name": "loader-base",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "help": "node . --help",
+    "version": "node . --version"
+  },
+  "author": "Genís Bayarri",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "2.4",
+    "dotenv": "^16.4.5",
+    "mongodb": "^3.5.7",
+    "ora": "3.4",
+    "yargs": "^17.7.2"
+  }
+}
