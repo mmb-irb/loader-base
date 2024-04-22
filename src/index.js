@@ -54,6 +54,9 @@ const commonHandler = commandName => async argv => {
 
                 throbber = ora('Checking DB connexion').start();
 
+                console.log(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`);
+                console.log(mongoAuth, mongoAuth.auth);
+
                 client = await mongodb.MongoClient.connect(
                     `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`,
                     mongoAuth
