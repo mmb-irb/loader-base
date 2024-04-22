@@ -20,6 +20,11 @@ const commonHandler = commandName => async argv => {
     if (!process.env.DB_LOGIN || !process.env.DB_PASSWORD) {
         // connecting to mongo without authentication
         mongoAuth = {
+            auth: {
+                user: process.env.DB_LOGIN,
+                password: process.env.DB_PASSWORD,
+            },
+            authSource: process.env.DB_AUTHSOURCE,
             useNewUrlParser: true,
             useUnifiedTopology: true,
             connectTimeoutMS: 0,
