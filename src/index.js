@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const process = require('process');
 const mongodb = require('mongodb');
 const ora = require('ora');
-const fs = require('fs');
+const { getMongoAuth } = require('./utils/db');   
 
 const commonHandler = commandName => async argv => {
 
@@ -15,36 +15,6 @@ const commonHandler = commandName => async argv => {
         process.exit(0);
     });
 
-    // CHECK IF DB_LOGIN AND DB_PASSWORD PROVIDED
-    let mongoAuth = {};
-    if (!process.env.DB_LOGIN || !process.env.DB_PASSWORD) {
-        // connecting to mongo without authentication
-        mongoAuth = {
-            /*auth: {
-                user: process.env.DB_LOGIN,
-                password: process.env.DB_PASSWORD,
-            },
-            authSource: process.env.DB_AUTHSOURCE,*/
-            //useNewUrlParser: true,
-            useUnifiedTopology: true,
-            connectTimeoutMS: 0,
-            socketTimeoutMS: 0, // In order to avoid Mongo connection time out
-        };
-    } else {
-        // connecting to mongo with authentication
-        mongoAuth = {
-            auth: {
-                user: process.env.DB_LOGIN,
-                password: process.env.DB_PASSWORD,
-            },
-            authSource: process.env.DB_AUTHSOURCE,
-            //useNewUrlParser: true,
-            useUnifiedTopology: true,
-            connectTimeoutMS: 0,
-            socketTimeoutMS: 0, // In order to avoid Mongo connection time out
-        };
-    }
-
     try {
         // CHECK IF MONGODB CONNEXION
         try {
@@ -54,12 +24,9 @@ const commonHandler = commandName => async argv => {
 
                 throbber = ora('Checking DB connexion').start();
 
-                /*console.log(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`);
-                console.log(mongoAuth);*/
-
                 client = await mongodb.MongoClient.connect(
                     `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`,
-                    mongoAuth
+                    getMongoAuth()
                 );
 
                 // Get the main database
