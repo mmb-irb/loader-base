@@ -13,7 +13,7 @@ const removeSingleDocument = async(id, db) => {
     }
 
     // remove document
-    const res = await db.collection('documents').deleteOne({ _id: ObjectId(id) });
+    const res = await db.collection('documents').deleteOne({ _id: new ObjectId(id) });
     return res;
 }
 

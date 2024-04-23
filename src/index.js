@@ -25,7 +25,7 @@ const commonHandler = commandName => async argv => {
                 password: process.env.DB_PASSWORD,
             },
             authSource: process.env.DB_AUTHSOURCE,*/
-            useNewUrlParser: true,
+            //useNewUrlParser: true,
             useUnifiedTopology: true,
             connectTimeoutMS: 0,
             socketTimeoutMS: 0, // In order to avoid Mongo connection time out
@@ -38,7 +38,7 @@ const commonHandler = commandName => async argv => {
                 password: process.env.DB_PASSWORD,
             },
             authSource: process.env.DB_AUTHSOURCE,
-            useNewUrlParser: true,
+            //useNewUrlParser: true,
             useUnifiedTopology: true,
             connectTimeoutMS: 0,
             socketTimeoutMS: 0, // In order to avoid Mongo connection time out
@@ -54,8 +54,8 @@ const commonHandler = commandName => async argv => {
 
                 throbber = ora('Checking DB connexion').start();
 
-                console.log(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`);
-                console.log(mongoAuth);
+                /*console.log(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`);
+                console.log(mongoAuth);*/
 
                 client = await mongodb.MongoClient.connect(
                     `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`,
