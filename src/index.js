@@ -20,11 +20,11 @@ const commonHandler = commandName => async argv => {
     if (!process.env.DB_LOGIN || !process.env.DB_PASSWORD) {
         // connecting to mongo without authentication
         mongoAuth = {
-            auth: {
+            /*auth: {
                 user: process.env.DB_LOGIN,
                 password: process.env.DB_PASSWORD,
             },
-            authSource: process.env.DB_AUTHSOURCE,
+            authSource: process.env.DB_AUTHSOURCE,*/
             useNewUrlParser: true,
             useUnifiedTopology: true,
             connectTimeoutMS: 0,
@@ -55,7 +55,7 @@ const commonHandler = commandName => async argv => {
                 throbber = ora('Checking DB connexion').start();
 
                 console.log(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`);
-                console.log(mongoAuth, mongoAuth.auth);
+                console.log(mongoAuth);
 
                 client = await mongodb.MongoClient.connect(
                     `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`,
