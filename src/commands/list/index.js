@@ -18,7 +18,7 @@ const list = async (
 
   const docsTable = docs.map(doc => {
     return {
-      id: doc._id,
+      id: doc._id.toString(), // Convert ObjectId to string
       title: doc.title,
       description: doc.description,
       created: doc.created,
@@ -27,7 +27,7 @@ const list = async (
 
   if(docsTable.length > 0) console.table(docsTable);
 
-  console.log(chalk.cyan(`\nProcess finished\n`))
+  console.log()
   process.exit(0);
 
 }
