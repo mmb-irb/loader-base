@@ -59,7 +59,7 @@ const commonHandler = commandName => async argv => {
             // e.g. in load command, argv contains the values of {file, c}
             argv,
             // Also include extra stuff useful across all scripts
-            { db }
+            { db, bucket: new mongodb.GridFSBucket(db, { bucketName: 'fs' }) }
         );
 
         if (finalMessage) finalMessage();

@@ -16,7 +16,7 @@ Have Node.js and npm installed and working
 
 ⚠️ No sensible default value is provided for any of these fields, they **need to be defined** ⚠️
 
-An `.env` file must be created in the project root. The file `git.env` can be taken as an example. The file must contain the following environment variables (the DB user needs to have writing rights):
+An `.env` file must be created in the project root. The file `.env.git` can be taken as an example. The file must contain the following environment variables (the DB user needs to have writing rights):
 
 | key              | value   | description                                     |
 | ---------------- | ------- | ----------------------------------------------- |

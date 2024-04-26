@@ -19,10 +19,27 @@ const removeSingleDocument = async(id, db) => {
     return res;
 }
 
+const removeAllDocuments = async(db) => {
+    // remove all the transition related collections
+    await db.collection('documents').deleteMany({});
+    await db.collection('fs.files').deleteMany({});
+    await db.collection('fs.chunks').deleteMany({});
+}
+
 const loadDocuments = async(docs, db) => {
     // insert documents
     const res = await db.collection('documents').insertMany(docs);
     return res;
+}
+
+const insertNewDocument = async (document, db) => {
+    const newTransition = await db.collection('documents').insertOne(document);
+
+    return newTransition;
+}
+
+const findGridFSFile = async(id, db) => {
+    return await db.collection('fs.files').findOne(id);
 }
 
 // returns mongo authentication object
@@ -57,6 +74,9 @@ const getMongoAuth = () => {
 module.exports = {
     listAllDocuments,
     removeSingleDocument,
+    removeAllDocuments,
     loadDocuments,
+    insertNewDocument,
+    findGridFSFile,
     getMongoAuth
 }

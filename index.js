@@ -28,6 +28,12 @@ yargs
         handler: commonHandler('load')
     })
     .command({
+        command: 'clean',
+        desc:
+            'Remove all items from database',
+        handler: commonHandler('clean')
+    })
+    .command({
       command: 'remove [-d] [-y]',
       desc:
           'Remove list of documents from database',

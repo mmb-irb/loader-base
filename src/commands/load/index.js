@@ -1,11 +1,46 @@
 const chalk = require('chalk');
 const ora = require('ora');
 const fs = require('fs');
-const { loadDocuments } = require('../../utils/db');     
+const { generateUId } = require('../../utils/common'); 
+const { checkJsonFormat } = require('../../utils/json');
+const { loadDocuments, insertNewDocument } = require('../../utils/db'); 
+const { getFilesPaths, uploadFiles } = require('../../utils/system/fs');     
 
 const load = async (
-  { file }, { db }
+  { file }, { db, bucket }
 ) => {
+
+  let throbber;
+  let counter = 1;
+
+  const createNewDocument = async (document, total_documents) => {
+
+    // generate unique id for this document (used as folder name for files)
+    const id = generateUId()
+
+    throbber.text = `Uploading files for ${document.title} document (${chalk.hex('#f36a5a').bold(counter)} / ${chalk.hex('#f36a5a').bold(total_documents)})`
+
+    // get files paths
+    const filesPaths = await getFilesPaths(document.files);
+
+    // uploadFiles
+    const filesIds = await uploadFiles(filesPaths, id, db, bucket);
+
+    // connect filesIds to document
+    const doc = {
+      id: id,
+      ...document,
+      files: filesIds,
+      created: new Date(),
+    };
+
+    // insert document
+    const nd = insertNewDocument(doc, db)
+
+    counter++;
+
+    return nd
+  }
 
   // check if file exists
   if (fs.existsSync(file)) {
@@ -17,36 +52,17 @@ const load = async (
         process.exit(1);
       }
 
-      let jsonData;
-      try {
-        // Parse the data as JSON
-        jsonData = JSON.parse(data);
-      } catch (error) {
-        console.log(chalk.hex('#cc0000').bold(`Error parsing JSON: ${error}`));
+      // check if the input file is a valid JSON file
+      const checkJSON = checkJsonFormat(data);
+
+      // if the input file is not a valid JSON file, print the error and exit
+      if(checkJSON.error) {
+        console.log(chalk.hex('#cc0000').bold(checkJSON.message));
         process.exit(1);
       }
 
-      // Check if the parsed data is an array with at least one object
-      if (!Array.isArray(jsonData) || jsonData.length === 0) {
-        console.log(chalk.hex('#cc0000').bold(`Input file does not contain an array with at least one object.`));
-        process.exit(1);
-      }
-
-      // Check the format of each object in the array
-      for (const project of jsonData) {
-        if (
-          typeof project.title !== 'string' ||
-          typeof project.description !== 'string' ||
-          typeof project.longDescription !== 'string' ||
-          !Array.isArray(project.authors) ||
-          project.authors.some(author => (
-            typeof author.name !== 'string' || typeof author.email !== 'string'
-          ))
-        ) {
-          console.log(chalk.hex('#cc0000').bold(`Invalid format for at least one project object.`));
-          process.exit(1);
-        }
-      }
+      // if the input file is a valid JSON file, get the JSON data
+      const jsonData = checkJSON.jsonData;
 
       // All checks passed
       console.log();
@@ -56,18 +72,28 @@ const load = async (
       throbber = ora({ text: 'Uploading documents, please wait' }).start();
 
       // add creation date to each document
-      const updatedJsonData = jsonData.map(item => {
+      /*const updatedJsonData = jsonData.map(item => {
         return {
           ...item,
           created: new Date(),
         };
       });
 
-      const docs = await loadDocuments(updatedJsonData, db);
+      for (const doc of updatedJsonData) {
+        await createNewDocument(doc, updatedJsonData.length)
+        //c++;
+      }*/
+
+      for (const doc of jsonData) {
+        await createNewDocument(doc, jsonData.length)
+        //c++;
+      }
+
+      //const docs = await loadDocuments(updatedJsonData, db);
 
       throbber.stopAndPersist({
         symbol: '\n✅',
-        text: `${docs.insertedCount} documents successfully uploaded\n`,
+        text: `${counter - 1} documents successfully uploaded\n`,
       });
 
       process.exit(0);
