@@ -50,10 +50,12 @@ const removeSingleDocument = async(id, db, bucket) => {
     const res = await db.collection('documents').deleteOne({ id: id });
 
     // get all gridFS files with document id
-    const files = await bucket.find({'metadata.id': id});
-    // remove all gridFS files with transition id
-    for await(const f of files) {
-        bucket.delete(f._id)
+    const filesCursor = await bucket.find({'metadata.id': id});
+    const files = await filesCursor.toArray();
+
+    // remove all gridFS files with document id
+    for (const f of files) {
+        await bucket.delete(f._id);
     }
 
     return res;
