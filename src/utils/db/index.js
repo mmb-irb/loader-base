@@ -1,21 +1,61 @@
-const { ObjectId } = require('mongodb');
 const pjson = require('../../../package.json');
 const semver = require('semver');
 
-const listAllDocuments = async(db) => {
-    // get all documents from the collection
-    const docs = await db.collection('documents').find({}).toArray()
-    return docs;
-}
+const listAllDocuments = async(db, bucket, last, first) => {
+    // get documents from the collection
+    let docs
 
-const removeSingleDocument = async(id, db) => {
-    // Check if id is a valid 24 hex characters string
-    if (!ObjectId.isValid(id)) {
-        return { invalid: true, item: id };
+    const MAX_LIMIT = 100;
+    const totalCount = await db.collection('documents').countDocuments();
+    let msg = null;
+    
+    if(!last && !first) {
+        // get all documents 
+        if(totalCount > MAX_LIMIT) {
+            docs = await db.collection('documents').find({}).sort({created: -1}).limit(10).toArray()
+            msg = `Showing first ${MAX_LIMIT} documents. Use --last or --first to get more documents.`
+        }
+        else docs = await db.collection('documents').find({}).toArray()
+    } else if(last) {
+        const l = last > MAX_LIMIT ? MAX_LIMIT : last
+        // get last N documents
+        docs = await db.collection('documents').find({}).sort({created: -1}).limit(l).toArray()
+        if(last > MAX_LIMIT) msg = `Showing last ${l} documents.`
+    } else if(first) {
+        const f = first > MAX_LIMIT ? MAX_LIMIT : first
+        // get first N documents
+        docs = await db.collection('documents').find({}).sort({created: 1}).limit(f).toArray()
+        if(first > MAX_LIMIT) msg = `Showing first ${f} documents.`
     }
 
+    // get number of gridFS files with document id
+    docs = await Promise.all(docs.map(async(item) => {
+        const filesCursor = await bucket.find({'metadata.id': item.id});
+        const filesCount = await filesCursor.count();
+        return {
+          ...item,
+          files: filesCount,
+        };
+    }));
+
+    return {
+        docs,
+        totalCount,
+        msg
+    }
+}
+
+const removeSingleDocument = async(id, db, bucket) => {
     // remove document
-    const res = await db.collection('documents').deleteOne({ _id: new ObjectId(id) });
+    const res = await db.collection('documents').deleteOne({ id: id });
+
+    // get all gridFS files with document id
+    const files = await bucket.find({'metadata.id': id});
+    // remove all gridFS files with transition id
+    for await(const f of files) {
+        bucket.delete(f._id)
+    }
+
     return res;
 }
 
@@ -33,6 +73,7 @@ const loadDocuments = async(docs, db) => {
 }
 
 const insertNewDocument = async (document, db) => {
+    // insert single document
     const newTransition = await db.collection('documents').insertOne(document);
 
     return newTransition;

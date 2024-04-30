@@ -69,32 +69,12 @@ const uploadFiles = async (paths, id, db, bucket) => {
   let ids = [];
   const promises = [];
 
-  /*for await (const filepath of paths) {
-      promises.push(uploadSingleFile(bucket, filepath, id, db))
-  }*/
-
   for (const filepath of paths) {
       ids.push(await uploadSingleFile(bucket, filepath, id, db))
   }
 
-  //await Promise.all(promises).then((res) => ids = res)
-
-  // filter and sort atomistic
-  
-  // put each id in its corresponding object
   return ids
-      /*origin: atomistic[0],
-      target: atomistic[atomistic.length - 1],
-      trajectory: {
-          reduced: ids.filter(item => item.file.includes('.reduced.crd'))[0].id,
-          raw: ids.filter(item => item.file.match(/^(?=.*crd)(?!.*reduced).*$/g))[0].id
-      },
-      movingparts: ids.filter(item => item.file.includes('movingparts.dat'))[0].id,
-      contacts: ids.filter(item => item.file.includes('contacts.dat'))[0].id,
-      topology: ids.filter(item => item.file.includes('.REF.pdb'))[0].id,
-      atomistic: atomistic*/
-  //} 
-
+    
 }
 
 module.exports = {

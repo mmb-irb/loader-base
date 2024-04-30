@@ -3,7 +3,7 @@ const ora = require('ora');
 const fs = require('fs');
 const { generateUId } = require('../../utils/common'); 
 const { checkJsonFormat } = require('../../utils/json');
-const { loadDocuments, insertNewDocument } = require('../../utils/db'); 
+const { insertNewDocument } = require('../../utils/db'); 
 const { getFilesPaths, uploadFiles } = require('../../utils/system/fs');     
 
 const load = async (
@@ -71,25 +71,10 @@ const load = async (
       // upload the documents
       throbber = ora({ text: 'Uploading documents, please wait' }).start();
 
-      // add creation date to each document
-      /*const updatedJsonData = jsonData.map(item => {
-        return {
-          ...item,
-          created: new Date(),
-        };
-      });
-
-      for (const doc of updatedJsonData) {
-        await createNewDocument(doc, updatedJsonData.length)
-        //c++;
-      }*/
-
+      // loop through the JSON data and create a new document for each
       for (const doc of jsonData) {
         await createNewDocument(doc, jsonData.length)
-        //c++;
       }
-
-      //const docs = await loadDocuments(updatedJsonData, db);
 
       throbber.stopAndPersist({
         symbol: '\n✅',

@@ -4,7 +4,7 @@ const readline = require('readline');
 const { removeSingleDocument } = require('../../utils/db');     
 
 const remove = async (
-  { documents, yes }, { db }
+  { documents, yes }, { db, bucket }
 ) => {
 
   if (documents.length === 0) {
@@ -18,7 +18,7 @@ const remove = async (
 
   const removeDoc = async (doc) => {
 
-    const res = await removeSingleDocument(doc, db);
+    const res = await removeSingleDocument(doc, db, bucket);
 
     if (res.invalid) invalid.push(res.item);
     else {
@@ -65,30 +65,6 @@ const remove = async (
         if(answer.toUpperCase() === 'Y') {  
 
           removeProcess();
-
-          /*console.log()
-          throbber = ora({ text: 'Removing documents, please wait', spinner: 'monkey' }).start();
-
-          for await(const d of documents) {
-
-            promises.push(removeDoc(d))
-
-          }
-
-          await Promise.all(promises)
-
-          if(removed > 0) {
-            throbber.stopAndPersist({
-                symbol: '✅',
-                text: `${removed} document successfully removed\n`,
-            });
-          } else {
-            throbber.stop();
-          }
-
-          if(invalid.length > 0) console.log(chalk.yellow(`⚠️  Warning! The following transitions were not found in the database: ${invalid.join(', ')}\n`))
-
-          process.exit(0);*/
 
         } else if(answer.toLowerCase() === 'n') {
           console.log(chalk.red('Process closed by user'));
