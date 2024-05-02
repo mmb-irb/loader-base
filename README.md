@@ -39,19 +39,55 @@ A help menu will be displayed, please follow the instructions provided by the he
 
 `node . load file.json`
 
-Upload data contained in file.json to the database.
+Upload data contained in file.json to the database. For this proof of concept, the structure of file.json must be:
+
+```json
+[
+  {
+    "title": "Document title",
+    "description": "Document description",
+    "longDescription": "Document long description, lorem ipsum dolor sit amet, consectetur adipiscing elit",
+    "authors": [
+      {
+        "name": "Author 1 name",
+        "email": "email1@mail.com"
+      },
+      {
+        "name": "Author 2 name",
+        "email": "email2@mail.com"
+      }
+    ],
+    "files": [
+      {
+        "title": "file1",
+        "path": "/path/to/file1"
+      },
+      {
+        "title": "file1",
+        "path": "/path/to/file1"
+      },
+    ]
+  }
+]
+```
+
+### clean
+
+`node . clean [-y]`
+
+Remove all data from database. Enabling -y flag avoids interaction.
 
 ### remove
 
-`node . remove -d id1 id2 id3`
+`node . remove -d id1 id2 id3 [-y]`
 
-Remove items from database by document id.
+Remove items from database by document id. Enabling -y flag avoids interaction.
 
 ### list
 
-`node . list`
+`node . list [-l] [-f]`
 
-List of all the items stored in the database.
+List of all the items stored in the database. -l and -f flags show last N or first N documents. By default, last 100 documents are shown.
 
 ## Credits
 
