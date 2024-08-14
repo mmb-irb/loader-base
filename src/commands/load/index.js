@@ -6,8 +6,6 @@ const { checkJsonFormat } = require('../../utils/json');
 const { insertNewDocument } = require('../../utils/db'); 
 const { getFilesPaths, uploadFiles } = require('../../utils/system/fs');     
 
-const { exec } = require('child_process');
-
 const load = async (
   { file }, { db, bucket }
 ) => {
@@ -43,20 +41,6 @@ const load = async (
 
     return nd
   }
-
-  exec('ls -la /data', (error, stdout, stderr) => {
-    if (error) {
-        console.error(`Error executing command: ${error.message}`);
-        return;
-    }
-
-    if (stderr) {
-        console.error(`stderr: ${stderr}`);
-        return;
-    }
-
-    console.log(`stdout: ${stdout}`);
-  });
 
   // check if file exists
   if (fs.existsSync(file)) {
